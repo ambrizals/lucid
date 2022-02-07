@@ -10,13 +10,13 @@
 import { QueryClientContract, OneOrMany } from '@ioc:Adonis/Lucid/Database'
 import { LucidRow } from '@ioc:Adonis/Lucid/Orm'
 
-import { HasOneTrough } from './index'
-import { HasOneTroughQueryBuilder } from './QueryBuilder'
-import { HasOneTroughSubQueryBuilder } from './SubQueryBuilder'
+import { HasOneThrough } from './index'
+import { HasOneThroughQueryBuilder } from './QueryBuilder'
+import { HasOneThroughSubQueryBuilder } from './SubQueryBuilder'
 
-export class HasOneTroughClient {
+export class HasOneThroughClient {
   constructor(
-    public relation: HasOneTrough,
+    public relation: HasOneThrough,
     private parent: LucidRow,
     private client: QueryClientContract
   ) {}
@@ -26,10 +26,10 @@ export class HasOneTroughClient {
    */
   public static query(
     client: QueryClientContract,
-    relation: HasOneTrough,
+    relation: HasOneThrough,
     rows: OneOrMany<LucidRow>
   ) {
-    const query = new HasOneTroughQueryBuilder(client.knexQuery(), client, rows, relation)
+    const query = new HasOneThroughQueryBuilder(client.knexQuery(), client, rows, relation)
     typeof relation.onQueryHook === 'function' && relation.onQueryHook(query)
     return query
   }
@@ -39,10 +39,10 @@ export class HasOneTroughClient {
    */
   public static eagerQuery(
     client: QueryClientContract,
-    relation: HasOneTrough,
+    relation: HasOneThrough,
     rows: OneOrMany<LucidRow>
   ) {
-    const query = new HasOneTroughQueryBuilder(client.knexQuery(), client, rows, relation)
+    const query = new HasOneThroughQueryBuilder(client.knexQuery(), client, rows, relation)
 
     query.isRelatedPreloadQuery = true
     typeof relation.onQueryHook === 'function' && relation.onQueryHook(query)
@@ -52,8 +52,8 @@ export class HasOneTroughClient {
   /**
    * Returns an instance of the sub query
    */
-  public static subQuery(client: QueryClientContract, relation: HasOneTrough) {
-    const query = new HasOneTroughSubQueryBuilder(client.knexQuery(), client, relation)
+  public static subQuery(client: QueryClientContract, relation: HasOneThrough) {
+    const query = new HasOneThroughSubQueryBuilder(client.knexQuery(), client, relation)
 
     typeof relation.onQueryHook === 'function' && relation.onQueryHook(query)
     return query
@@ -63,6 +63,6 @@ export class HasOneTroughClient {
    * Returns an instance of has many through query builder
    */
   public query(): any {
-    return HasOneTroughClient.query(this.client, this.relation, this.parent)
+    return HasOneThroughClient.query(this.client, this.relation, this.parent)
   }
 }

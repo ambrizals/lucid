@@ -22,6 +22,7 @@ import {
   ManyToManyDecorator,
   DateTimeColumnDecorator,
   HasManyThroughDecorator,
+  HasOneThroughDecorator,
 } from '@ioc:Adonis/Lucid/Orm'
 
 import { dateColumn } from './date'
@@ -124,6 +125,19 @@ export const hasManyThrough: HasManyThroughDecorator = ([relatedModel, throughMo
       'hasManyThrough',
       relatedModel,
       Object.assign({ relatedModel, throughModel }, relation)
+    )
+  }
+}
+
+export const hasOneThrough: HasOneThroughDecorator = ([relatedModel, throughModel]) => {
+  return function decorateAsRelation(target, property: string) {
+    const Model = target.constructor as LucidModel
+    Model.boot()
+    Model.$addRelation(
+      property,
+      'hasOneThrough',
+      relatedModel,
+      Object.assign({ relatedModel, throughModel })
     )
   }
 }

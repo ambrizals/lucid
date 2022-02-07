@@ -12,19 +12,19 @@ import {
   LucidRow,
   LucidModel,
   ThroughRelationOptions,
-  HasOneTrough as ModelHasOneTrough,
-  HasOneTroughRelationContract,
+  HasOneThrough as ModelHasOneThrough,
+  HasOneThroughRelationContract,
 } from '@ioc:Adonis/Lucid/Orm'
 
 import { KeysExtractor } from '../KeysExtractor'
 import { ensureRelationIsBooted } from '../../../utils'
-import { HasOneTroughClient } from './QueryClient'
+import { HasOneThroughClient } from './QueryClient'
 
 /**
  * Manages loading and persisting has many through relationship
  */
-export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, LucidModel> {
-  public type = 'hasOneTrough' as const
+export class HasOneThrough implements HasOneThroughRelationContract<LucidModel, LucidModel> {
+  public type = 'hasOneThrough' as const
 
   public booted: boolean = false
 
@@ -65,7 +65,7 @@ export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, Lu
   constructor(
     public relationName: string,
     public relatedModel: () => LucidModel,
-    private options: ThroughRelationOptions<ModelHasOneTrough<LucidModel>> & {
+    private options: ThroughRelationOptions<ModelHasOneThrough<LucidModel>> & {
       throughModel: () => LucidModel
     },
     public model: LucidModel
@@ -75,7 +75,7 @@ export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, Lu
    * Clone relationship instance
    */
   public clone(parent: LucidModel): any {
-    return new HasOneTrough(this.relationName, this.relatedModel, { ...this.options }, parent)
+    return new HasOneThrough(this.relationName, this.relatedModel, { ...this.options }, parent)
   }
 
   /**
@@ -212,7 +212,7 @@ export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, Lu
    */
   public client(parent: LucidRow, client: QueryClientContract): any {
     ensureRelationIsBooted(this)
-    return new HasOneTroughClient(this, parent, client)
+    return new HasOneThroughClient(this, parent, client)
   }
 
   /**
@@ -220,7 +220,7 @@ export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, Lu
    */
   public eagerQuery(parent: OneOrMany<LucidRow>, client: QueryClientContract) {
     ensureRelationIsBooted(this)
-    return HasOneTroughClient.eagerQuery(client, this, parent)
+    return HasOneThroughClient.eagerQuery(client, this, parent)
   }
 
   /**
@@ -228,6 +228,6 @@ export class HasOneTrough implements HasOneTroughRelationContract<LucidModel, Lu
    */
   public subQuery(client: QueryClientContract) {
     ensureRelationIsBooted(this)
-    return HasOneTroughClient.subQuery(client, this)
+    return HasOneThroughClient.subQuery(client, this)
   }
 }

@@ -133,6 +133,12 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     column?: Omit<ThroughRelationOptions<HasManyThrough<RelatedModel>>, 'throughModel'>
   ) => TypedDecorator<HasManyThrough<RelatedModel>>
 
+  // TODO: This is not a valid decorator signature
+  export type HasOneThroughDecorator = <RelatedModel extends LucidModel>(
+    model: [() => RelatedModel, () => LucidModel],
+    column?: Omit<ThroughRelationOptions<HasOneThrough<RelatedModel>>, 'throughModel'>
+  ) => TypedDecorator<HasOneThrough<RelatedModel>>
+
   /**
    * ------------------------------------------------------
    * Opaque typed relationships
@@ -149,7 +155,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
       | 'belongsTo'
       | 'manyToMany'
       | 'hasManyThrough'
-      | 'hasOneTrough'
+      | 'hasOneThrough'
   }
 
   /**
@@ -237,21 +243,21 @@ declare module '@ioc:Adonis/Lucid/Orm' {
   }
 
   /**
-   * Opaque type for has one trough relationship
+   * Opaque type for has one Through relationship
    */
   //TODO: This need to be refactored
-  export type HasOneTrough<
+  export type HasOneThrough<
     RelatedModel extends LucidModel,
     ParentModel extends LucidModel = LucidModel
   > = InstanceType<RelatedModel> & {
-    readonly __opaque_type: 'hasOneTrough'
+    readonly __opaque_type: 'hasOneThrough'
     model: RelatedModel
     instance: InstanceType<RelatedModel>
-    client: HasManyThroughClientContract<
-      HasManyThroughRelationContract<ParentModel, RelatedModel>,
+    client: HasOneThroughClientContract<
+      HasOneThroughRelationContract<ParentModel, RelatedModel>,
       RelatedModel
     >
-    builder: HasManyThroughQueryBuilderContract<RelatedModel, any>
+    builder: HasOneThroughClientBuilderContract<RelatedModel, any>
     subQuery: RelationSubQueryBuilderContract<RelatedModel>
   }
 
@@ -266,7 +272,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     | BelongsTo<LucidModel, LucidModel>
     | ManyToMany<LucidModel, LucidModel>
     | HasManyThrough<LucidModel, LucidModel>
-    | HasOneTrough<LucidModel, LucidModel>
+    | HasOneThrough<LucidModel, LucidModel>
 
   /**
    * ------------------------------------------------------
@@ -567,11 +573,11 @@ declare module '@ioc:Adonis/Lucid/Orm' {
   }
 
   // TODO: Need to finish
-  export interface HasOneTroughRelationContract<
+  export interface HasOneThroughRelationContract<
     ParentModel extends LucidModel,
     RelatedModel extends LucidModel
   > extends BaseRelationContract<ParentModel, RelatedModel> {
-    type: 'hasOneTrough'
+    type: 'hasOneThrough'
     readonly localKey: string
     readonly foreignKey: string
     readonly throughLocalKey: string
@@ -617,7 +623,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     | BelongsToRelationContract<LucidModel, LucidModel>
     | ManyToManyRelationContract<LucidModel, LucidModel>
     | HasManyThroughRelationContract<LucidModel, LucidModel>
-    | HasOneTroughRelationContract<LucidModel, LucidModel>
+    | HasOneThroughRelationContract<LucidModel, LucidModel>
 
   /**
    * ------------------------------------------------------
@@ -833,14 +839,14 @@ declare module '@ioc:Adonis/Lucid/Orm' {
   }
 
   //TODO: Need to refactor
-  export interface HasOneTroughClientContract<
+  export interface HasOneThroughClientContract<
     Relation extends RelationshipsContract,
     RelatedModel extends LucidModel
   > extends RelationQueryClientContract<Relation, RelatedModel> {
     /**
      * Return a query builder instance of the relationship
      */
-    query<Result = InstanceType<RelatedModel>>(): HasManyThroughQueryBuilderContract<
+    query<Result = InstanceType<RelatedModel>>(): HasOneThroughClientBuilderContract<
       RelatedModel,
       Result
     >
@@ -924,7 +930,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     groupOrderBy(column: string, direction?: 'asc' | 'desc'): this
   }
 
-  export interface HasOneTroughClientBuilderContract<Related extends LucidModel, Result>
+  export interface HasOneThroughClientBuilderContract<Related extends LucidModel, Result>
     extends RelationQueryBuilderContract<Related, Result> {}
 
   /**

@@ -11,7 +11,7 @@ import { Knex } from 'knex'
 import { QueryClientContract } from '@ioc:Adonis/Lucid/Database'
 import { LucidModel, RelationSubQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 
-import { HasOneTrough } from './index'
+import { HasOneThrough } from './index'
 import { BaseSubQueryBuilder } from '../Base/SubQueryBuilder'
 
 /**
@@ -19,7 +19,7 @@ import { BaseSubQueryBuilder } from '../Base/SubQueryBuilder'
  * to the current relationship
  */
 // export class HasManyThroughSubQueryBuilder
-export class HasOneTroughSubQueryBuilder
+export class HasOneThroughSubQueryBuilder
   extends BaseSubQueryBuilder
   implements RelationSubQueryBuilderContract<LucidModel>
 {
@@ -44,11 +44,11 @@ export class HasOneTroughSubQueryBuilder
   constructor(
     builder: Knex.QueryBuilder,
     client: QueryClientContract,
-    private relation: HasOneTrough
+    private relation: HasOneThrough
   ) {
     super(builder, client, relation, (userFn) => {
       return ($builder) => {
-        const subQuery = new HasOneTroughSubQueryBuilder($builder, this.client, this.relation)
+        const subQuery = new HasOneThroughSubQueryBuilder($builder, this.client, this.relation)
         subQuery.isChildQuery = true
         userFn(subQuery)
         subQuery.applyWhere()
@@ -144,7 +144,7 @@ export class HasOneTroughSubQueryBuilder
    * Clones the current query
    */
   public clone() {
-    const clonedQuery = new HasOneTroughSubQueryBuilder(
+    const clonedQuery = new HasOneThroughSubQueryBuilder(
       this.knexQuery.clone(),
       this.client,
       this.relation

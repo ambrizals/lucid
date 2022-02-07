@@ -9,9 +9,9 @@
 
 import { Knex } from 'knex'
 import { QueryClientContract } from '@ioc:Adonis/Lucid/Database'
-import { LucidRow, LucidModel, HasManyThroughQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import { LucidRow, LucidModel, HasOneThroughClientBuilderContract } from '@ioc:Adonis/Lucid/Orm'
 
-import { HasOneTrough } from './index'
+import { HasOneThrough } from './index'
 import { getValue, unique } from '../../../utils'
 import { BaseQueryBuilder } from '../Base/QueryBuilder'
 
@@ -20,9 +20,9 @@ import { BaseQueryBuilder } from '../Base/QueryBuilder'
  * to the current relationship
  */
 // export class HasManyThroughQueryBuilder
-export class HasOneTroughQueryBuilder
+export class HasOneThroughQueryBuilder
   extends BaseQueryBuilder
-  implements HasManyThroughQueryBuilderContract<LucidModel, LucidModel>
+  implements HasOneThroughClientBuilderContract<LucidModel, LucidModel>
 {
   protected cherryPickingKeys: boolean = false
   protected appliedConstraints: boolean = false
@@ -34,11 +34,11 @@ export class HasOneTroughQueryBuilder
     builder: Knex.QueryBuilder,
     client: QueryClientContract,
     private parent: LucidRow | LucidRow[],
-    private relation: HasOneTrough
+    private relation: HasOneThrough
   ) {
     super(builder, client, relation, (userFn) => {
       return ($builder) => {
-        const subQuery = new HasOneTroughQueryBuilder(
+        const subQuery = new HasOneThroughQueryBuilder(
           $builder,
           this.client,
           this.parent,
@@ -69,7 +69,7 @@ export class HasOneTroughQueryBuilder
   /**
    * Adds where constraint to the pivot table
    */
-  private addWhereConstraints(builder: HasOneTroughQueryBuilder) {
+  private addWhereConstraints(builder: HasOneThroughQueryBuilder) {
     const queryAction = this.queryAction()
 
     /**
@@ -205,7 +205,7 @@ export class HasOneTroughQueryBuilder
    * Clones the current query
    */
   public clone() {
-    const clonedQuery = new HasOneTroughQueryBuilder(
+    const clonedQuery = new HasOneThroughQueryBuilder(
       this.knexQuery.clone(),
       this.client,
       this.parent,

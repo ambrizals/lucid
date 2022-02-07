@@ -58,6 +58,7 @@ import {
 } from '../../utils'
 import { SnakeCaseNamingStrategy } from '../NamingStrategies/SnakeCase'
 import { LazyLoadAggregates } from '../Relations/AggregatesLoader/LazyLoad'
+import { HasOneThrough } from '../Relations/HasOneTrough'
 
 const MANY_RELATIONS = ['hasMany', 'manyToMany', 'hasManyThrough']
 const DATE_TIME_TYPES = {
@@ -417,9 +418,18 @@ export class BaseModel implements LucidRow {
     this.$relationsDefinitions.set(name, new HasManyThrough(name, relatedModel, options, this))
   }
 
+  protected static $addHasOneThrough(
+    name: string,
+    relatedModel: () => LucidModel,
+    options: ThroughRelationOptions<ModelRelations>
+  ) {
+    this.$relationsDefinitions.set(name, new HasOneThrough(name, relatedModel, options, this))
+  }
+
   /**
    * Adds a relationship
    */
+  // TODO: Add belongsto Options
   public static $addRelation(
     name: string,
     type: ModelRelations['__opaque_type'],
@@ -450,6 +460,15 @@ export class BaseModel implements LucidRow {
           options as ThroughRelationOptions<ModelRelations>
         )
         break
+
+      case 'hasOneThrough':
+        this.$addHasOneThrough(
+          name,
+          relatedModel,
+          options as ThroughRelationOptions<ModelRelations>
+        )
+        break
+
       default:
         throw new Error(`${type} is not a supported relation type`)
     }

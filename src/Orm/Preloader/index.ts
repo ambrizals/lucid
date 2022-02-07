@@ -64,7 +64,11 @@ export class Preloader implements PreloaderContract<LucidRow> {
     /**
      * hasOne and belongsTo will always return an array of a single row (if done right)
      */
-    if (relation.type === 'hasOne' || relation.type === 'belongsTo') {
+    if (
+      relation.type === 'hasOne' ||
+      relation.type === 'belongsTo' ||
+      relation.type === 'hasOneThrough'
+    ) {
       relation.setRelated(parent, result[0] || null)
       return
     }
