@@ -143,7 +143,13 @@ declare module '@ioc:Adonis/Lucid/Orm' {
    *
    */
   export type ModelRelationTypes = {
-    readonly __opaque_type: 'hasOne' | 'hasMany' | 'belongsTo' | 'manyToMany' | 'hasManyThrough'
+    readonly __opaque_type:
+      | 'hasOne'
+      | 'hasMany'
+      | 'belongsTo'
+      | 'manyToMany'
+      | 'hasManyThrough'
+      | 'hasOneTrough'
   }
 
   /**
@@ -231,6 +237,25 @@ declare module '@ioc:Adonis/Lucid/Orm' {
   }
 
   /**
+   * Opaque type for has one trough relationship
+   */
+  //TODO: This need to be refactored
+  export type HasOneTrough<
+    RelatedModel extends LucidModel,
+    ParentModel extends LucidModel = LucidModel
+  > = InstanceType<RelatedModel> & {
+    readonly __opaque_type: 'hasOneTrough'
+    model: RelatedModel
+    instance: InstanceType<RelatedModel>
+    client: HasManyThroughClientContract<
+      HasManyThroughRelationContract<ParentModel, RelatedModel>,
+      RelatedModel
+    >
+    builder: HasManyThroughQueryBuilderContract<RelatedModel, any>
+    subQuery: RelationSubQueryBuilderContract<RelatedModel>
+  }
+
+  /**
    * These exists on the models directly as a relationship. The idea
    * is to distinguish relationship properties from other model
    * properties.
@@ -241,6 +266,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     | BelongsTo<LucidModel, LucidModel>
     | ManyToMany<LucidModel, LucidModel>
     | HasManyThrough<LucidModel, LucidModel>
+    | HasOneTrough<LucidModel, LucidModel>
 
   /**
    * ------------------------------------------------------
@@ -540,6 +566,48 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     ): RelationQueryClientContract<this, RelatedModel>
   }
 
+  // TODO: Need to finish
+  export interface HasOneTroughRelationContract<
+    ParentModel extends LucidModel,
+    RelatedModel extends LucidModel
+  > extends BaseRelationContract<ParentModel, RelatedModel> {
+    type: 'hasOneTrough'
+    readonly localKey: string
+    readonly foreignKey: string
+    readonly throughLocalKey: string
+    readonly throughForeignKey: string
+
+    /**
+     * Set related models as a relationship on the parent model
+     */
+    setRelated(parent: InstanceType<ParentModel>, related: InstanceType<RelatedModel> | null): void
+
+    /**
+     * Push related model(s) as a relationship on the parent model
+     */
+    pushRelated(
+      parent: InstanceType<ParentModel>,
+      related: InstanceType<RelatedModel> | InstanceType<RelatedModel>
+    ): void
+
+    /**
+     * Set multiple related instances on the multiple parent models.
+     * This method is generally invoked during eager load.
+     */
+    setRelatedForMany(
+      parent: InstanceType<ParentModel>[],
+      related: InstanceType<RelatedModel>[]
+    ): void
+
+    /**
+     * Returns the query client for a model instance
+     */
+    client(
+      model: InstanceType<ParentModel>,
+      client: QueryClientContract
+    ): RelationQueryClientContract<this, RelatedModel>
+  }
+
   /**
    * A union of relationships
    */
@@ -549,6 +617,7 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     | BelongsToRelationContract<LucidModel, LucidModel>
     | ManyToManyRelationContract<LucidModel, LucidModel>
     | HasManyThroughRelationContract<LucidModel, LucidModel>
+    | HasOneTroughRelationContract<LucidModel, LucidModel>
 
   /**
    * ------------------------------------------------------
@@ -763,6 +832,20 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     >
   }
 
+  //TODO: Need to refactor
+  export interface HasOneTroughClientContract<
+    Relation extends RelationshipsContract,
+    RelatedModel extends LucidModel
+  > extends RelationQueryClientContract<Relation, RelatedModel> {
+    /**
+     * Return a query builder instance of the relationship
+     */
+    query<Result = InstanceType<RelatedModel>>(): HasManyThroughQueryBuilderContract<
+      RelatedModel,
+      Result
+    >
+  }
+
   /**
    * ------------------------------------------------------
    * Relationships query builders
@@ -840,6 +923,9 @@ declare module '@ioc:Adonis/Lucid/Orm' {
     groupLimit(limit: number): this
     groupOrderBy(column: string, direction?: 'asc' | 'desc'): this
   }
+
+  export interface HasOneTroughClientBuilderContract<Related extends LucidModel, Result>
+    extends RelationQueryBuilderContract<Related, Result> {}
 
   /**
    * Possible signatures for adding a where clause
